@@ -1,5 +1,7 @@
 import numpy as np
 
+# simple Monte Carlo simulation to estimate the value of pi
+
 #Plot a circle and a square
 circle_x = np.linspace(0, 1, 100)
 circle_y = np.sqrt(1-circle_x**2)
