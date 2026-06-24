@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 from numba import njit
 
@@ -33,7 +34,7 @@ def sweep_once(s, N, J, h, T, E):
 
         dE = 2 * s[x, y] * (J * nn + h)
 
-        if dE <= 0 or np.random.rand() < np.exp(-dE / T):
+        if dE <= 0 or np.random.rand() < math.exp(-dE / T):
             s[x, y] *= -1
             E += dE
 
@@ -84,11 +85,11 @@ def thermo(energies, mags, J, h, T, N):
     }
 
 
-temperatures = [1, 9, 11.0 , 100]
+temperatures = [1, 9, 11.0, 11.3 , 100,100_000]
 for temp in temperatures:
-    print("       -        ")
+    print(f"       {temp}        ")
     Nsize = 50
-    energies, mags = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=5000, warmup=1000)
+    energies, mags = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=10000, warmup=1000)
     results = thermo(energies, mags, J=-5.0, h=0.0, T=temp, N=Nsize)
     print(f"Temperature: {temp}")
     for k, v in results.items():
