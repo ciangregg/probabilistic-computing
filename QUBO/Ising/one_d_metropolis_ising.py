@@ -1,5 +1,7 @@
 import numpy as np
 
+#~~~~~~~~~~~~~~~~~~~~ Metropolis algorithm for Ising model ~~~~~~~~~~~~~~~~~~~~#
+
 #1 pick an initial state s^(0)=(1,1,...,1) and set t=0
 #2 pick a new state s' by flipping a random bit of s^(t)
 #3 calculate the energy difference ΔE=E(s')-E(s^(t))
@@ -9,11 +11,12 @@ import numpy as np
 #7 repeat steps 2-6 for a fixed number of iterations or until convergence
 #8 return the final configurations of the system s^(t)
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 def energy(s, J, h):
     return -0.5 * np.sum(J * np.outer(s, s)) - np.sum(h * s)
 
-def metropolis_ising(J, h, T, steps=1000):
+def one_d_metropolis_ising(J, h, T, steps=1000):
     seq=[]
     N = len(h)          # get size from h
     s = np.ones(N)      # initial state: all spins up
@@ -40,6 +43,8 @@ def metropolis_ising(J, h, T, steps=1000):
     return s , seq
 
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
 T=1.0  # temperature
 N=4   # number of spins
 def J_random(N):
@@ -54,10 +59,16 @@ def J_1(N):
     np.fill_diagonal(J, 0)     # no self-interactions
     return J
 
+def J_1d(N):
+    J = np.zeros((N, N))
+    for i in range(N-1):
+        J[i, i+1] = 1
+        J[i+1, i] = 1
+    return J
 # length 10
 
 #J=J_random(N)
-J=J_1(N)
+J=J_1d(N)
 h = np.zeros(N)
 #
 print("J matrix:")
@@ -67,7 +78,7 @@ print("h vector:")
 print(h)
 #
 print("Final state:")   
-print(metropolis_ising(J, h, T=1.0, steps=1000)[0])
+print(one_d_metropolis_ising(J, h, T=1.0, steps=1000)[0])
 
 #print("Sequence of states:")
-#print(metropolis_ising(J, h, T=1.0, steps=1000)[1])
+#print(one_d_metropolis_ising(J, h, T=1.0, steps=1000)[1])
