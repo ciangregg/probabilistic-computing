@@ -18,38 +18,33 @@ def energy(s, J, h):
     return E
 
 
-def two_d_metropolis_ising(N, J, h, T, steps):
+# swapped from saving sample after every flip to saving sample after every sweep (N*N flips)
+
+def two_d_metropolis_ising(N, J, h, T, sweeps):
     s = np.ones((N, N), dtype=int)
-    seq = []
+    samples = []
 
-    for _ in range(steps):
+    for sweep in range(sweeps):
 
-        x = np.random.randint(N)
-        y = np.random.randint(N)
+        for _ in range(N * N):
+            x = np.random.randint(N)
+            y = np.random.randint(N)
 
-        s_prime = s.copy()
-        
-        if s_prime[x, y] == 1:
-            s_prime[x, y] = -1
-        else:
-            s_prime[x, y] = 1
-        
-        # nearest neighbors sum with periodic boundary conditions
-        nn_sum = (
-            s[(x + 1) % N, y] # % moduluo introduces periodic boundary conditions
-            + s[(x - 1) % N, y]
-            + s[x, (y + 1) % N]
-            + s[x, (y - 1) % N]
-        )
-        deltaE = 2 * s[x, y] * (J * nn_sum + h)
-    
-        if deltaE <= 0 or np.random.rand() < np.exp(-deltaE / (T)):
-            s = s_prime
+            nn = (
+                s[(x+1)%N, y] +
+                s[(x-1)%N, y] +
+                s[x, (y+1)%N] +
+                s[x, (y-1)%N]
+            )
 
-        seq.append(s.copy())
+            dE = 2 * s[x, y] * (J * nn + h)
 
-    burn_in = 100
-    return s, seq[burn_in:]
+            if dE <= 0 or np.random.rand() < np.exp(-dE / T):
+                s[x, y] *= -1
+
+        samples.append(s.copy())
+
+    return samples
 
 def thermo(samples, J, h, T, N):
     Nspins = N * N
@@ -58,6 +53,7 @@ def thermo(samples, J, h, T, N):
     mags     = np.array([s.sum() for s in samples])  # total magnetization
 
     E = energies.mean() / Nspins
+    EJ= round(E/abs(J),0)
     cv = energies.var() / (T**2 * Nspins)
 
     m = mags.mean() / Nspins
@@ -68,16 +64,18 @@ def thermo(samples, J, h, T, N):
     return {
         "Tc": Tc,
         "E per spin": E,
+        "E per spin wrt J": EJ,
         "cv": cv,
         "m": m,
         "chi": chi
     }
 
 
-temperatures = [1.0, 11.3459, 10000.0]
+temperatures = [1.0, 9.0, 11.3459, 15.0]
 for temp in temperatures:
-    _, samples = two_d_metropolis_ising(N=10, J=-5.0, h=0.0, T=temp, steps=100_000)
-    results = thermo(samples, J=-5.0, h=0.0, T=temp, N=10)
+    Nsize = 50
+    samples = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=10000)
+    results = thermo(samples, J=-5.0, h=0.0, T=temp, N=Nsize)
     print(f"Temperature: {temp}")
     for k, v in results.items():
         print(f"{k:>8s} = {float(v):.4f}")
