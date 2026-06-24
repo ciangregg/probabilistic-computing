@@ -1,6 +1,6 @@
 import numpy as np
 
-# Build recombining tree for American option 
+# Build recombining tree for an optimal stopping problem
 
 def build_recombining_tree(steps):
     nodes = [(t,j) for t in range(steps + 1) for j in range(t + 1)]

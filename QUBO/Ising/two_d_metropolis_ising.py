@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from numba import njit
 
 def energy(s, J, h):
     #2D Ising energy with periodic boundary conditions.
@@ -20,44 +21,59 @@ def energy(s, J, h):
 
 # swapped from saving sample after every flip to saving sample after every sweep (N*N flips)
 
-def two_d_metropolis_ising(N, J, h, T, sweeps):
-    s = np.ones((N, N), dtype=int)
-    samples = []
+def two_d_metropolis_ising(N, J, h, T, sweeps, warmup=None):
+    if warmup is None:
+        warmup = sweeps // 10
 
-    for sweep in range(sweeps):
+    s = np.random.choice([-1, 1], size=(N, N))
+
+    E = energy(s, J, h)  # initial energy
+
+    def sweep_once():
+        nonlocal E
 
         for _ in range(N * N):
             x = np.random.randint(N)
             y = np.random.randint(N)
 
             nn = (
-                s[(x+1)%N, y] +
-                s[(x-1)%N, y] +
-                s[x, (y+1)%N] +
-                s[x, (y-1)%N]
+                s[(x + 1) % N, y] +
+                s[(x - 1) % N, y] +
+                s[x, (y + 1) % N] +
+                s[x, (y - 1) % N]
             )
 
             dE = 2 * s[x, y] * (J * nn + h)
 
             if dE <= 0 or np.random.rand() < np.exp(-dE / T):
                 s[x, y] *= -1
+                E += dE
 
-        samples.append(s.copy())
+    # warmup
+    for _ in range(warmup):
+        sweep_once()
 
-    return samples
+    energies = []
+    mags = []
 
-def thermo(samples, J, h, T, N):
+    for _ in range(sweeps):
+        sweep_once()
+
+        energies.append(E)
+        mags.append(s.sum())
+
+    return np.array(energies), np.array(mags)
+
+def thermo(energies, mags, J, h, T, N):
     Nspins = N * N
 
-    energies = np.array([energy(s, J, h) for s in samples])
-    mags     = np.array([s.sum() for s in samples])  # total magnetization
+    E = np.mean(energies) / Nspins
+    EJ = E / abs(J)
 
-    E = energies.mean() / Nspins
-    EJ= round(E/abs(J),0)
-    cv = energies.var() / (T**2 * Nspins)
+    cv = np.var(energies) / (T**2 * Nspins)
 
-    m = mags.mean() / Nspins
-    chi = mags.var() / (T * Nspins)
+    m = np.mean(mags) / Nspins
+    chi = np.var(mags) / (T * Nspins)
 
     Tc = 2 * abs(J) / np.log(1 + np.sqrt(2))
 
@@ -71,15 +87,34 @@ def thermo(samples, J, h, T, N):
     }
 
 
-temperatures = [1.0, 9.0, 11.3459, 15.0]
+temperatures = [9]
 for temp in temperatures:
     Nsize = 50
-    samples = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=10000)
-    results = thermo(samples, J=-5.0, h=0.0, T=temp, N=Nsize)
+    energies, mags = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=1000, warmup=500)
+    results = thermo(energies, mags, J=-5.0, h=0.0, T=temp, N=Nsize)
     print(f"Temperature: {temp}")
     for k, v in results.items():
         print(f"{k:>8s} = {float(v):.4f}")
    
+
+
+
+'''
+temperatures = [5.0]
+#[1.0, 9.0, 11.3459, 15.0]
+for temp in temperatures:
+    Nsize = 50
+    energies, mags = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=1000, warmup=500)
+    results = thermo(energies, mags, J=-5.0, h=0.0, T=temp, N=Nsize)
+    print(f"Temperature: {temp}")
+    for k, v in results.items():
+        print(f"{k:>8s} = {float(v):.4f}")
+'''
+
+
+
+
+
 
 '''
 fig, ax = plt.subplots()
