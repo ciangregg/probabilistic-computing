@@ -18,47 +18,44 @@ def energy(s, J, h):
 
     return E
 
+@njit
+def sweep_once(s, N, J, h, T, E):
+    for _ in range(N * N):
+        x = np.random.randint(N)
+        y = np.random.randint(N)
 
-# swapped from saving sample after every flip to saving sample after every sweep (N*N flips)
+        nn = (
+            s[(x + 1) % N, y] +
+            s[(x - 1) % N, y] +
+            s[x, (y + 1) % N] +
+            s[x, (y - 1) % N]
+        )
+
+        dE = 2 * s[x, y] * (J * nn + h)
+
+        if dE <= 0 or np.random.rand() < np.exp(-dE / T):
+            s[x, y] *= -1
+            E += dE
+
+    return E
 
 def two_d_metropolis_ising(N, J, h, T, sweeps, warmup=None):
     if warmup is None:
         warmup = sweeps // 10
 
-    s = np.random.choice([-1, 1], size=(N, N))
+    s = np.random.choice(np.array([-1, 1]), size=(N, N))
 
-    E = energy(s, J, h)  # initial energy
-
-    def sweep_once():
-        nonlocal E
-
-        for _ in range(N * N):
-            x = np.random.randint(N)
-            y = np.random.randint(N)
-
-            nn = (
-                s[(x + 1) % N, y] +
-                s[(x - 1) % N, y] +
-                s[x, (y + 1) % N] +
-                s[x, (y - 1) % N]
-            )
-
-            dE = 2 * s[x, y] * (J * nn + h)
-
-            if dE <= 0 or np.random.rand() < np.exp(-dE / T):
-                s[x, y] *= -1
-                E += dE
+    E = energy(s, J, h)
 
     # warmup
     for _ in range(warmup):
-        sweep_once()
+        E = sweep_once(s, N, J, h, T, E)
 
     energies = []
     mags = []
 
     for _ in range(sweeps):
-        sweep_once()
-
+        E = sweep_once(s, N, J, h, T, E)
         energies.append(E)
         mags.append(s.sum())
 
@@ -87,15 +84,19 @@ def thermo(energies, mags, J, h, T, N):
     }
 
 
-temperatures = [9]
+temperatures = [1, 9, 11.0 , 100]
 for temp in temperatures:
+    print("       -        ")
     Nsize = 50
-    energies, mags = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=1000, warmup=500)
+    energies, mags = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=5000, warmup=1000)
     results = thermo(energies, mags, J=-5.0, h=0.0, T=temp, N=Nsize)
     print(f"Temperature: {temp}")
     for k, v in results.items():
         print(f"{k:>8s} = {float(v):.4f}")
+        
    
+
+
 
 
 
