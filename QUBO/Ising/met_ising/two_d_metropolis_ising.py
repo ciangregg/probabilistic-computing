@@ -88,6 +88,7 @@ def thermo(energies, mags, J, h, T, N):
 temperatures = [1, 9, 11.0, 11.3 , 100,100_000]
 for temp in temperatures:
     print(f"       {temp}        ")
+    print("                      ")
     Nsize = 50
     energies, mags = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=10000, warmup=1000)
     results = thermo(energies, mags, J=-5.0, h=0.0, T=temp, N=Nsize)
@@ -95,30 +96,10 @@ for temp in temperatures:
     for k, v in results.items():
         print(f"{k:>8s} = {float(v):.4f}")
         
-   
-
-
-
 
 
 '''
-temperatures = [5.0]
-#[1.0, 9.0, 11.3459, 15.0]
-for temp in temperatures:
-    Nsize = 50
-    energies, mags = two_d_metropolis_ising(Nsize, J=-5.0, h=0.0, T=temp, sweeps=1000, warmup=500)
-    results = thermo(energies, mags, J=-5.0, h=0.0, T=temp, N=Nsize)
-    print(f"Temperature: {temp}")
-    for k, v in results.items():
-        print(f"{k:>8s} = {float(v):.4f}")
-'''
-
-
-
-
-
-
-'''
+# colouring states 
 fig, ax = plt.subplots()
 
 ax.matshow(final_state, cmap="coolwarm", vmin=-1, vmax=1)
