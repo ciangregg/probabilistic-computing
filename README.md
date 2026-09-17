@@ -28,6 +28,7 @@ The Structure of the the project:
 
 ### Ising model
 Some Ising model observables plotted to test our annealing framework, $\chi$ didn't quite work at $T_c$ due to correlation of our samples.
+
 $$
 \begin{align}
     \langle E\rangle=\frac{1}{N^2}\left(-\frac1 2\sum^N_{ij }J_{ij}\sigma_i\sigma_j-\sum_i^Nh_i\sigma_i\right)=\text{average }E
