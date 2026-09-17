@@ -73,11 +73,13 @@ H&=2A\sum_{i>j}^ Ns_is_j -\frac{B}{2}\sum_{(i,j)\in E}  s_is_j
 $$
 
 
+<div align="center">
 <table>
   <tr>
     <td><img src="example-problems/fig/annealing-maxcut.gif" width="400"></td>
     <td><img src="example-problems/fig/maxcut_anneal_n10.gif" width="400"></td>
   </tr>
 </table>
+</div>
 
 If you want to check out other combinatorial problems we worked through such as graph colouring and the Travelling Salesman Problem, check out the first draft of our [report](report.pdf) 
