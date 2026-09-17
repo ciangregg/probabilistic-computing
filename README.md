@@ -55,7 +55,7 @@ $$
 $$
 
 <div align="center">
-<img src="Ising/figures/met-mag-cv-chi-E.png" width="500">
+<img src="Ising/figures/met-mag-cv-chi-E.png" width="650">
 </div>
 
 
