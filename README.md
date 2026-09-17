@@ -28,23 +28,30 @@ The Structure of the the project:
 
 ### Ising model
 Some Ising model observables plotted to test our annealing framework, $\chi$ didn't quite work at $T_c$ due to correlation of our samples.
-$\begin{align}
+$$
+\begin{align}
     \langle E\rangle=\frac{1}{N^2}\left(-\frac1 2\sum^N_{ij }J_{ij}\sigma_i\sigma_j-\sum_i^Nh_i\sigma_i\right)=\text{average }E
-\end{align}$
+\end{align}
+$$
 
-$\begin{align}
+$$
+\begin{align}
     \langle m \rangle=\frac{1}{N^2}\sum_i\sigma_i=\text{average}~\sigma
-\end{align}$
+\end{align}
+$$
 
-$\begin{align}
+$$
+\begin{align}
     c_v&=-\left. \frac{\partial}{\partial T}\frac{\partial lnZ}{\partial\beta}\right|_v
     =\frac{1}{k_BT^2}\left(\langle E^2\rangle-\langle E \rangle^2\right)=\frac{\text{Variance}~E}{k_BT^2}\\
-\end{align}$
+\end{align}
+$$
 
-$
+$$
 \begin{align}
     \chi=\lim_{B\rightarrow0}\frac{\partial\langle m \rangle}{\partial B}=\cdots=\frac{N^2}{k_BT}\left(\langle m^2\rangle-\langle m \rangle^2\right)=\frac{N^2\times\text{Variance}~m}{k_BT}
-\end{align}$
+\end{align}
+$$
 
 <img src="Ising/figures/met-mag-cv-chi-E.png" width="800">
 
@@ -55,10 +62,11 @@ Some annealing plots from graph partition problem:
 Take some undirected graph G(V, E) and n colours. Can we colour each vertex such that no edge connects vertices of the same colour? 
 </div>
 
-$
+$$
 \begin{align}
 H&=2A\sum_{i>j}^ Ns_is_j -\frac{B}{2}\sum_{(i,j)\in E}  s_is_j
-\end{align}$
+\end{align}
+$$
 
 
 <table>
