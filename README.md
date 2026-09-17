@@ -53,7 +53,10 @@ $$
 \end{align}
 $$
 
-<img src="Ising/figures/met-mag-cv-chi-E.png" width="800">
+<div align="center">
+<img src="Ising/figures/met-mag-cv-chi-E.png" width="500">
+</div>
+
 
 ### Combinatorial Problems
 Some annealing plots from graph partition problem:
